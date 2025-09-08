@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { signUp, checkNickname } from "@/api/auth";
 import { getErrorMessage } from "@/lib/http-error";
 import "../styles/SignUp.css";
+import { useAlert } from "@/components/AlertProvider";
 
 /** term 목록 .. 지금은 예시로 필수 2개만 하드코딩. */
 const REQUIRED_TERMS = [
@@ -21,6 +22,7 @@ const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,100}$/;
 
 export default function SignUp() {
   const nav = useNavigate();
+  const alert = useAlert();
 
   const [email, setEmail] = useState("");
   const [nickname, setNickname] = useState("");
@@ -162,10 +164,11 @@ export default function SignUp() {
         controllerRef.current.signal,
       );
 
-      alert("회원가입이 완료되었습니다. 로그인 해주세요.");
+      alert.success("회원가입이 완료되었습니다. 로그인 해주세요.");
       void nav("/login", { replace: true, state: { email } });
     } catch (err: unknown) {
       setError(getErrorMessage(err));
+      alert.error("회원가입 중 오류가 발생했습니다.");
     } finally {
       setSubmitting(false);
     }

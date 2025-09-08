@@ -12,31 +12,34 @@ import CommunityNew from "./pages/CommunityNew";
 import DetailPost from "./pages/DetailPost";
 import ChatWidget from "./components/ChatWidget";
 import Profile from "./pages/Profile";
+import { AlertProvider } from "./components/AlertProvider";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/recycling-education" element={<Education />} />
-        <Route path="/community">
-          <Route index element={<Community />} />
-          <Route path=":id" element={<CommunityDetail />} />
-          <Route path="create" element={<CommunityNew />} />
-        </Route>
-        <Route path="/post">
-          <Route index element={<Post />} />
-          <Route path="create" element={<CreatePost />} />
-          <Route path=":id" element={<DetailPost />} />
-        </Route>
-        <Route path="/profile">
-          <Route path=":userId" element={<Profile />} />
-          <Route path="me" element={<Profile />} />
-        </Route>
-      </Routes>
-      <ChatWidget />
-    </BrowserRouter>
+    <AlertProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/recycling-education" element={<Education />} />
+          <Route path="/community">
+            <Route index element={<Community />} />
+            <Route path=":id" element={<CommunityDetail />} />
+            <Route path="create" element={<CommunityNew />} />
+          </Route>
+          <Route path="/post">
+            <Route index element={<Post />} />
+            <Route path="create" element={<CreatePost />} />
+            <Route path=":id" element={<DetailPost />} />
+          </Route>
+          <Route path="/profile">
+            <Route path=":userId" element={<Profile />} />
+            <Route path="me" element={<Profile />} />
+          </Route>
+        </Routes>
+        <ChatWidget />
+      </BrowserRouter>
+    </AlertProvider>
   );
 }
 
