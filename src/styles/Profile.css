@@ -94,6 +94,8 @@
 }
 .pf-badge--green{ color:#0a7a59; background:#ecfff6; border-color:#baf3d0; } /* 진행중 */
 .pf-badge--blue{ color:#0d58d1; background:#f3f6fb; border-color:#c3dafb; } /* 완료 */
+.pf-badge--blue { color:#1d4ed8; background:#eef2ff; border-color:#c7d2fe; }
+
 
 /* 아이콘 */
 .pf-ico{ width:1em; height:1em; display:inline-block; }

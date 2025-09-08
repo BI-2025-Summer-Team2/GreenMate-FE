@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { PageNavigation } from "../components/PageNavigation";
 import "../styles/Profile.css";
+import { useAlert } from "@/components/AlertProvider";
+import ConfirmModal from "../components/ConfirmModal";
 
 type Activity = {
   id: number;
@@ -171,6 +173,8 @@ const ActivityItem: React.FC<{ item: Activity; onClick?: () => void }> = ({
 export default function Profile() {
   const { userId = "me" } = useParams();
   const navigate = useNavigate();
+  const toast = useAlert();
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const [data, setData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -196,6 +200,21 @@ export default function Profile() {
         .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)),
     [data?.posts],
   );
+
+  const handleWithdraw = async () => {
+    try {
+      const ok = await requestWithdraw();
+      if (ok) {
+        toast.success("탈퇴가 완료되었습니다.");
+        void navigate("/");
+      }
+    } catch (error) {
+      console.error("회원 탈퇴 실패:", error);
+      toast.error("탈퇴 처리 중 오류가 발생했습니다.");
+    } finally {
+      setShowConfirm(false);
+    }
+  };
 
   if (loading) return <div className="pf-loading">로딩 중…</div>;
   if (!data) return <div className="pf-loading">데이터가 없습니다.</div>;
@@ -332,30 +351,20 @@ export default function Profile() {
           <div className="pf-withdraw-wrap">
             <button
               className="pf-withdraw"
-              onClick={() => {
-                void (async () => {
-                  if (
-                    !window.confirm(
-                      "정말 탈퇴하시겠어요?\n커뮤니티 글/댓글은 삭제되고, 환경 활동 기록은 ‘탈퇴한 유저’로 표시되어 남습니다.",
-                    )
-                  ) {
-                    return;
-                  }
-                  try {
-                    const ok = await requestWithdraw();
-                    if (ok) {
-                      alert("탈퇴가 완료되었습니다.");
-                      void navigate("/");
-                    }
-                  } catch (error) {
-                    console.error("회원 탈퇴 실패:", error);
-                    alert("탈퇴 처리 중 오류가 발생했습니다.");
-                  }
-                })();
-              }}
+              onClick={() => setShowConfirm(true)}
             >
               회원탈퇴
             </button>
+
+            <ConfirmModal
+              visible={showConfirm}
+              title="회원탈퇴"
+              message={`정말 탈퇴하시겠어요?\n커뮤니티 글/댓글은 삭제되고,\n환경 활동 기록은 ‘탈퇴한 유저’로\n표시되어 남습니다.`}
+              confirmText="탈퇴하기"
+              cancelText="취소"
+              onConfirm={handleWithdraw}
+              onCancel={() => setShowConfirm(false)}
+            />
           </div>
         )}
       </main>
