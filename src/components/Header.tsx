@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Leaf, LogOut, User } from "lucide-react";
 import profileImage from "./images/profile.jpg";
 import { useNavigate } from "react-router-dom";
+import { useAlert } from "@/components/AlertProvider";
 
 interface HeaderProps {
   user?: {
@@ -96,6 +97,7 @@ const Header = ({ user }: HeaderProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const toast = useAlert();
 
   const defaultUser = {
     nickname: "konempty",
@@ -109,7 +111,7 @@ const Header = ({ user }: HeaderProps) => {
   };
 
   const handleLogout = () => {
-    alert("로그아웃 되었습니다.");
+    toast.success("로그아웃 되었습니다.");
   };
 
   useEffect(() => {
