@@ -32,7 +32,7 @@ const convertApiPostToMockPost = (
     activityDate: apiPost.eventDate,
     images: apiPost.imageUrls,
     maxParticipants: apiPost.maxParticipants,
-    participants: apiPost.currentParticipants,
+    participants: apiPost.currentParticipants ?? 0,
     locationType: apiPost.locationType === "CIRCLE" ? "CIRCLE" : "POLYGON",
     // 타입 불일치 해결 - AreaData 인터페이스로 안전하게 변환
     locationGeojson: apiPost.locationGeojson as Post["locationGeojson"],
@@ -66,6 +66,9 @@ const Post = () => {
         );
 
         const convertedPosts = response.content.map(convertApiPostToMockPost);
+        
+        console.log("API 응답 데이터:", response.content);
+        console.log("변환된 게시물 데이터:", convertedPosts);
 
         if (reset) {
           setPosts(convertedPosts);
