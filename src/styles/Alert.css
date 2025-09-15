@@ -1,0 +1,24 @@
+.gm-alert-stack {
+  position: fixed; top: 30px; left:50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 1000; align-items: center;
+}
+
+.gm-alert {
+  min-width: 240px;
+  background: #111827; color: #fff;
+  border-radius: 10px; padding: 12px 14px;
+  box-shadow: 0 10px 20px rgba(0,0,0,.15);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  animation: gm-fade-in .18s ease-out;
+  font-size: 14px; text-align: center;
+}
+.gm-success { background: #16a34a; }
+.gm-error   { background: #ef4444; }
+.gm-info    { background: #2563eb; }
+
+.gm-close {
+  border: none; background: transparent; color: inherit;
+  font-size: 16px; cursor: pointer; line-height: 1;
+}
+@keyframes gm-fade-in { from {opacity:0; transform: translateY(-10px);} to {opacity:1; transform:none;} }

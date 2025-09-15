@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { PageNavigation } from "../components/PageNavigation";
 import "../styles/Community.css";
+import { useAlert } from "@/components/AlertProvider";
 
 const MAX_IMAGES = 5;
 const MAX_MB = 1;
@@ -11,6 +12,7 @@ const CONTENT_MAX = 500;
 
 export default function CommunityNew() {
   const navigate = useNavigate();
+  const toast = useAlert();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -54,14 +56,14 @@ export default function CommunityNew() {
 
     const remain = Math.max(0, MAX_IMAGES - files.length);
     if (remain === 0) {
-      alert(`이미지는 최대 ${MAX_IMAGES}장까지 첨부할 수 있어요.`);
+      toast.info(`이미지는 최대 ${MAX_IMAGES}장까지 첨부할 수 있어요.`);
       e.target.value = "";
       return;
     }
     const clipped = selected.slice(0, remain);
     const overSize = clipped.filter((f) => f.size > MAX_MB * 1024 * 1024);
     if (overSize.length) {
-      alert(`파일당 최대 ${MAX_MB}MB 까지만 업로드 가능합니다.`);
+      toast.info(`파일당 최대 ${MAX_MB}MB 까지만 업로드 가능합니다.`);
     }
 
     const safe = clipped.filter((f) => f.size <= MAX_MB * 1024 * 1024);
@@ -103,8 +105,10 @@ export default function CommunityNew() {
       // 실제 API 붙일 땐 FormData로..
       // 더미 처리
       await new Promise((r) => setTimeout(r, 600));
-      alert("작성 완료(더미)");
+      toast.success("작성 완료(더미)");
       void navigate("/community");
+    } catch {
+      toast.error("글 작성 중 오류가 발생했습니다.");
     } finally {
       setSubmitting(false);
     }
