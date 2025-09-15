@@ -17,10 +17,13 @@ import {
   type GeoJSON,
 } from "../api/greenTeamPost";
 
+import { useAlert } from "@/components/AlertProvider";
+
 import "../styles/CreatePost.css";
 
 const CreatePost = () => {
   const navigate = useNavigate();
+  const toast = useAlert();
 
   // Form states
   const [title, setTitle] = useState("");
@@ -198,7 +201,7 @@ const CreatePost = () => {
       try {
         // 유효성 검사
         if (!areaData || !locationType) {
-          alert("활동 지역을 설정해주세요.");
+          toast.info("활동 지역을 설정해주세요.");
           return;
         }
 
@@ -208,7 +211,7 @@ const CreatePost = () => {
           locationType,
         );
         if (!locationGeojson) {
-          alert("지역 데이터를 변환하는 중 오류가 발생했습니다.");
+          toast.error("지역 데이터를 변환하는 중 오류가 발생했습니다.");
           return;
         }
 
@@ -250,6 +253,7 @@ const CreatePost = () => {
         setIsSubmitted(true);
 
         // 성공 시 게시글 목록 페이지로 이동
+        toast.success("모집글이 성공적으로 생성되었습니다.");
         void navigate("/post");
       } catch (error) {
         // AbortError는 의도적인 취소이므로 에러로 처리하지 않음
@@ -260,7 +264,7 @@ const CreatePost = () => {
 
         console.error("모집글 생성 중 오류가 발생했습니다:", error);
         // 에러 처리 - 사용자에게 알림
-        alert("모집글 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+        toast.error("모집글 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
       } finally {
         // 요청이 완료되었으므로 ref 초기화
         if (currentRequestRef.current === abortController) {
