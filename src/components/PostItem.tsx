@@ -7,13 +7,6 @@ import type { Post } from "../mocks/posts";
 const PostItem = ({ post }: { post: Post }) => {
   const navigate = useNavigate();
 
-  console.log("PostItem 데이터:", {
-    id: post.id,
-    participants: post.participants,
-    maxParticipants: post.maxParticipants,
-    title: post.title,
-  });
-
   const handleDetailView = () => {
     void navigate(`/post/${post.id}`);
   };

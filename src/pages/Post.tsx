@@ -66,9 +66,6 @@ const Post = () => {
         );
 
         const convertedPosts = response.content.map(convertApiPostToMockPost);
-        
-        console.log("API 응답 데이터:", response.content);
-        console.log("변환된 게시물 데이터:", convertedPosts);
 
         if (reset) {
           setPosts(convertedPosts);

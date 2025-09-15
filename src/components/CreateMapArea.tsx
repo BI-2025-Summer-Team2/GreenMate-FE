@@ -49,7 +49,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
           },
         };
 
-        console.log("원 데이터 업데이트:", areaData);
         onAreaChange?.(areaData, "CIRCLE");
       }
     },
@@ -74,7 +73,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
         points: points,
       };
 
-      console.log("폴리곤 데이터 업데이트:", areaData);
       onAreaChange?.(areaData, "POLYGON");
     },
     [onAreaChange],
@@ -116,7 +114,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
             },
           };
 
-          console.log("원 데이터:", areaData);
           onAreaChange?.(areaData, "CIRCLE");
 
           // 편집 이벤트 리스너 추가
@@ -143,7 +140,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
           points: points,
         };
 
-        console.log("폴리곤 데이터:", areaData);
         onAreaChange?.(areaData, "POLYGON");
 
         // 편집 이벤트 리스너 추가
@@ -166,8 +162,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
     if (!isLoaded || !mapRef.current) return;
 
     try {
-      console.log("CreateMapArea 지도 초기화 시작...");
-
       // 서울 시청을 기본 중심으로 설정
       const map = new google.maps.Map(mapRef.current, {
         zoom: 13,
@@ -219,7 +213,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
         drawingManager,
         "circlecomplete",
         (circle: google.maps.Circle) => {
-          console.log("원 그리기 완료");
           handleShapeComplete(circle, "circle");
         },
       );
@@ -228,12 +221,9 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
         drawingManager,
         "polygoncomplete",
         (polygon: google.maps.Polygon) => {
-          console.log("폴리곤 그리기 완료");
           handleShapeComplete(polygon, "polygon");
         },
       );
-
-      console.log("CreateMapArea 지도 초기화 완료");
     } catch (err) {
       console.error("CreateMapArea 지도 초기화 오류:", err);
     }
@@ -276,7 +266,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
     }
 
     onAreaChange?.(null, null);
-    console.log("영역 지우기 완료");
   };
 
   // 지도 타입 변경

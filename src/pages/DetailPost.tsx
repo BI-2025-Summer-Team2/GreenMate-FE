@@ -222,9 +222,8 @@ const DetailPost = () => {
             postId={post.id}
             currentUserId={currentUserId}
             initialComments={post.comments}
-            onCommentAdd={(comment) => {
+            onCommentAdd={() => {
               // 필요시 댓글 추가 시 추가 작업 수행
-              console.log("새 댓글 추가됨:", comment);
             }}
           />
         </div>
