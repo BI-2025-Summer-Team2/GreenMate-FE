@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://green-mate-t2-api.jayden-bin.cc",
+        target: "http://localhost:8080",
         changeOrigin: true,
       },
     },

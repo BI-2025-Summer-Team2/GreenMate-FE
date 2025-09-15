@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Circle, Pentagon } from "lucide-react";
 import Button from "./Button";
 import { Label } from "./label";
@@ -32,13 +32,136 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
 
   const { isLoaded, isLoading, error, loadProgress } = useGoogleMapsLoader();
 
+  // 원 데이터 업데이트
+  const updateCircleData = useCallback(
+    (circle: google.maps.Circle) => {
+      const center = circle.getCenter();
+      const radius = circle.getRadius();
+
+      if (center) {
+        const areaData: AreaData = {
+          data: {
+            center: {
+              lat: center.lat(),
+              lng: center.lng(),
+            },
+            radius: radius,
+          },
+        };
+
+        onAreaChange?.(areaData, "CIRCLE");
+      }
+    },
+    [onAreaChange],
+  );
+
+  // 폴리곤 데이터 업데이트
+  const updatePolygonData = useCallback(
+    (polygon: google.maps.Polygon) => {
+      const path = polygon.getPath();
+      const points = [];
+
+      for (let i = 0; i < path.getLength(); i++) {
+        const point = path.getAt(i);
+        points.push({
+          lat: point.lat(),
+          lng: point.lng(),
+        });
+      }
+
+      const areaData: AreaData = {
+        points: points,
+      };
+
+      onAreaChange?.(areaData, "POLYGON");
+    },
+    [onAreaChange],
+  );
+
+  // 도형 완성 처리
+  const handleShapeComplete = useCallback(
+    (
+      shape: google.maps.Circle | google.maps.Polygon,
+      type: "circle" | "polygon",
+    ) => {
+      // 기존 도형 제거
+      if (currentShapeRef.current) {
+        currentShapeRef.current.setMap(null);
+      }
+
+      currentShapeRef.current = shape;
+      setHasAreaData(true);
+
+      // 그리기 모드 해제
+      if (drawingManagerRef.current) {
+        drawingManagerRef.current.setDrawingMode(null);
+      }
+      setAreaType(null);
+
+      // AreaData 생성 및 콜백 호출
+      if (type === "circle" && shape instanceof google.maps.Circle) {
+        const center = shape.getCenter();
+        const radius = shape.getRadius();
+
+        if (center) {
+          const areaData: AreaData = {
+            data: {
+              center: {
+                lat: center.lat(),
+                lng: center.lng(),
+              },
+              radius: radius,
+            },
+          };
+
+          onAreaChange?.(areaData, "CIRCLE");
+
+          // 편집 이벤트 리스너 추가
+          google.maps.event.addListener(shape, "center_changed", () =>
+            updateCircleData(shape),
+          );
+          google.maps.event.addListener(shape, "radius_changed", () =>
+            updateCircleData(shape),
+          );
+        }
+      } else if (type === "polygon" && shape instanceof google.maps.Polygon) {
+        const path = shape.getPath();
+        const points = [];
+
+        for (let i = 0; i < path.getLength(); i++) {
+          const point = path.getAt(i);
+          points.push({
+            lat: point.lat(),
+            lng: point.lng(),
+          });
+        }
+
+        const areaData: AreaData = {
+          points: points,
+        };
+
+        onAreaChange?.(areaData, "POLYGON");
+
+        // 편집 이벤트 리스너 추가
+        google.maps.event.addListener(path, "set_at", () =>
+          updatePolygonData(shape),
+        );
+        google.maps.event.addListener(path, "insert_at", () =>
+          updatePolygonData(shape),
+        );
+        google.maps.event.addListener(path, "remove_at", () =>
+          updatePolygonData(shape),
+        );
+      }
+    },
+    [onAreaChange, setAreaType, updateCircleData, updatePolygonData],
+  );
+
   // 지도 초기화
   useEffect(() => {
     if (!isLoaded || !mapRef.current) return;
 
     try {
-      console.log("CreateMapArea 지도 초기화 시작...");
-
       // 서울 시청을 기본 중심으로 설정
       const map = new google.maps.Map(mapRef.current, {
         zoom: 13,
@@ -90,7 +213,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
         drawingManager,
         "circlecomplete",
         (circle: google.maps.Circle) => {
-          console.log("원 그리기 완료");
           handleShapeComplete(circle, "circle");
         },
       );
@@ -99,136 +221,13 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
         drawingManager,
         "polygoncomplete",
         (polygon: google.maps.Polygon) => {
-          console.log("폴리곤 그리기 완료");
           handleShapeComplete(polygon, "polygon");
         },
       );
-
-      console.log("CreateMapArea 지도 초기화 완료");
     } catch (err) {
       console.error("CreateMapArea 지도 초기화 오류:", err);
     }
-  }, [isLoaded]);
-
-  // 도형 완성 처리
-  const handleShapeComplete = (
-    shape: google.maps.Circle | google.maps.Polygon,
-    type: "circle" | "polygon",
-  ) => {
-    // 기존 도형 제거
-    if (currentShapeRef.current) {
-      currentShapeRef.current.setMap(null);
-    }
-
-    currentShapeRef.current = shape;
-    setHasAreaData(true);
-
-    // 그리기 모드 해제
-    if (drawingManagerRef.current) {
-      drawingManagerRef.current.setDrawingMode(null);
-    }
-    setAreaType(null);
-
-    // AreaData 생성 및 콜백 호출
-    if (type === "circle" && shape instanceof google.maps.Circle) {
-      const center = shape.getCenter();
-      const radius = shape.getRadius();
-
-      if (center) {
-        const areaData: AreaData = {
-          data: {
-            center: {
-              lat: center.lat(),
-              lng: center.lng(),
-            },
-            radius: radius,
-          },
-        };
-
-        console.log("원 데이터:", areaData);
-        onAreaChange?.(areaData, "CIRCLE");
-
-        // 편집 이벤트 리스너 추가
-        google.maps.event.addListener(shape, "center_changed", () =>
-          updateCircleData(shape),
-        );
-        google.maps.event.addListener(shape, "radius_changed", () =>
-          updateCircleData(shape),
-        );
-      }
-    } else if (type === "polygon" && shape instanceof google.maps.Polygon) {
-      const path = shape.getPath();
-      const points = [];
-
-      for (let i = 0; i < path.getLength(); i++) {
-        const point = path.getAt(i);
-        points.push({
-          lat: point.lat(),
-          lng: point.lng(),
-        });
-      }
-
-      const areaData: AreaData = {
-        points: points,
-      };
-
-      console.log("폴리곤 데이터:", areaData);
-      onAreaChange?.(areaData, "POLYGON");
-
-      // 편집 이벤트 리스너 추가
-      google.maps.event.addListener(path, "set_at", () =>
-        updatePolygonData(shape),
-      );
-      google.maps.event.addListener(path, "insert_at", () =>
-        updatePolygonData(shape),
-      );
-      google.maps.event.addListener(path, "remove_at", () =>
-        updatePolygonData(shape),
-      );
-    }
-  };
-
-  // 원 데이터 업데이트
-  const updateCircleData = (circle: google.maps.Circle) => {
-    const center = circle.getCenter();
-    const radius = circle.getRadius();
-
-    if (center) {
-      const areaData: AreaData = {
-        data: {
-          center: {
-            lat: center.lat(),
-            lng: center.lng(),
-          },
-          radius: radius,
-        },
-      };
-
-      console.log("원 데이터 업데이트:", areaData);
-      onAreaChange?.(areaData, "CIRCLE");
-    }
-  };
-
-  // 폴리곤 데이터 업데이트
-  const updatePolygonData = (polygon: google.maps.Polygon) => {
-    const path = polygon.getPath();
-    const points = [];
-
-    for (let i = 0; i < path.getLength(); i++) {
-      const point = path.getAt(i);
-      points.push({
-        lat: point.lat(),
-        lng: point.lng(),
-      });
-    }
-
-    const areaData: AreaData = {
-      points: points,
-    };
-
-    console.log("폴리곤 데이터 업데이트:", areaData);
-    onAreaChange?.(areaData, "POLYGON");
-  };
+  }, [isLoaded, handleShapeComplete, mapType]);
 
   // 영역 타입 선택
   const handleAreaTypeSelect = (type: "circle" | "polygon") => {
@@ -267,7 +266,6 @@ const CreateMapArea: React.FC<MapAreaProps> = ({ className, onAreaChange }) => {
     }
 
     onAreaChange?.(null, null);
-    console.log("영역 지우기 완료");
   };
 
   // 지도 타입 변경

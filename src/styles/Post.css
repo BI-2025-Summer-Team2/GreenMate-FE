@@ -205,3 +205,36 @@
 .post-item-button:hover {
   background-color: var(--color-post-button-white-hover);
 }
+
+/* 로딩 및 에러 상태 스타일 */
+.loading-message, .error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  min-height: 200px;
+}
+
+.loading-message {
+  color: var(--color-post-text-gray);
+  font-size: 1.1rem;
+}
+
+.error-message {
+  color: #dc3545;
+  gap: 1rem;
+}
+
+.error-message p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.load-more-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding: 1rem;
+}

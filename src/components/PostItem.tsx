@@ -26,7 +26,7 @@ const PostItem = ({ post }: { post: Post }) => {
           <Calendar size={16} /> {post.date} {post.time}
         </p>
         <p className="post-item-meta">
-          <Users size={16} /> {post.participants}명 참여
+          <Users size={16} /> 참여 {post.participants || 0}/{post.maxParticipants || 0}명
         </p>
         <div className="post-item-bottom">
           <Label
