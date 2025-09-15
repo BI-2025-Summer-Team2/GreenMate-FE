@@ -8,7 +8,7 @@ export default function Alert({
   message,
   kind = "info",
   onClose,
-  duration = 2500,
+  duration,
 }: {
   id: string;
   message: string;

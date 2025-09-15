@@ -31,7 +31,11 @@ export default function ConfirmModal({
           <button type="button" className="confirm-cancel" onClick={onCancel}>
             {cancelText}
           </button>
-          <button className="confirm-confirm" onClick={void onConfirm}>
+          <button
+            type="button"
+            className="confirm-confirm"
+            onClick={void onConfirm}
+          >
             {confirmText}
           </button>
         </div>
