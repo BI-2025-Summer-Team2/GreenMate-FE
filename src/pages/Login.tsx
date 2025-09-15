@@ -4,17 +4,31 @@ import { Link } from "react-router-dom";
 
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { useAlert } from "@/components/AlertProvider";
 
 import "../styles/Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const toast = useAlert();
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-    // TODO : 추후 API 연동 및 로그인 로직 구현
     e.preventDefault();
-    alert("로그인");
+    if (!email.trim() || !password.trim()) {
+      toast.info("이메일과 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      // TODO : 추후 API 연동 및 로그인 로직 구현
+      toast.success("로그인 성공! GreenMate에 오신 것을 환영합니다.");
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요.",
+      );
+    }
   };
 
   return (
